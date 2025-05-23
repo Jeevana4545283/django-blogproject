@@ -10,8 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-import os # <-- Ensure this line is at the very top
+import os
 from pathlib import Path
+import dj_database_url # <--- NEW: Added this import for database configuration
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,12 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # Get SECRET_KEY from environment variable, default to a development key if not set
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-*vwobl4%73!jji^a4pfl55dpgv9owj$%a(sgv2sq56pdbt3xs!') # <-- UPDATED line
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-*vwobl4%73!jji^a4pfl55dpgv9owj$%a(sgv2sq56pdbt3xs!')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get('DEBUG', 'True') == 'True' # <-- UPDATED line, reads DEBUG from env, defaults to True for local
+DEBUG = os.environ.get('DEBUG', 'True') == 'True' # Reads DEBUG from env, defaults to True for local
 
-# --- START OF ALLOWED_HOSTS SECTION ---
+# --- ALLOWED_HOSTS SECTION ---
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] # Keep these for local development
 
 # Add your Render domain from environment variable, if it exists
@@ -45,7 +46,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles', # <--- Good to have this near the top
+    'django.contrib.staticfiles', # Good to have this near the top
     
       'main', 
       
@@ -70,7 +71,7 @@ ROOT_URLCONF = 'blog_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],   # ✅ templates folder support
+        'DIRS': [BASE_DIR / 'templates'], # ✅ templates folder support
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -89,13 +90,25 @@ WSGI_APPLICATION = 'blog_project.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
+# --- START OF UPDATED DATABASES SECTION ---
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default='sqlite:///db.sqlite3',  # Default for local development
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 }
+
+# If DEBUG is False (i.e., in production on Render), ensure it uses the DATABASE_URL provided by Render
+if not DEBUG:
+    DATABASE_URL = os.environ.get('DATABASE_URL')
+    if DATABASE_URL:
+        DATABASES['default'] = dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
+# --- END OF UPDATED DATABASES SECTION ---
 
 
 # Password validation

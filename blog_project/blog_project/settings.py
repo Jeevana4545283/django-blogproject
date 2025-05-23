@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
-import os # <-- Make sure this line is at the very top, if not already there
+import os # <-- Ensure this line is at the very top
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -21,20 +21,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-*vwobl4%73!jji^a4pfl55dpgv9owj$%a(sgv2sq56pdbt3xs!'
+# Get SECRET_KEY from environment variable, default to a development key if not set
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-*vwobl4%73!jji^a4pfl55dpgv9owj$%a(sgv2sq56pdbt3xs!') # <-- UPDATED line
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True' # <-- UPDATED line, reads DEBUG from env, defaults to True for local
 
-# --- START OF UPDATED ALLOWED_HOSTS SECTION ---
+# --- START OF ALLOWED_HOSTS SECTION ---
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] # Keep these for local development
 
 # Add your Render domain from environment variable, if it exists
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-
-# --- END OF UPDATED ALLOWED_HOSTS SECTION ---
+# --- END OF ALLOWED_HOSTS SECTION ---
 
 
 # Application definition
@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    'django.contrib.staticfiles', # <--- Good to have this near the top
     
       'main', 
       
@@ -77,7 +77,7 @@ TEMPLATES = [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.template.context_processors.messages',
+                'django.contrib.messages.context_processors.messages',
             ],
         },
     },

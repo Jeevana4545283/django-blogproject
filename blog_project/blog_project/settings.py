@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os # <-- Make sure this line is at the very top, if not already there
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,7 +26,15 @@ SECRET_KEY = 'django-insecure-*vwobl4%73!jji^a4pfl55dpgv9owj$%a(sgv2sq56pdbt3xs!
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# --- START OF UPDATED ALLOWED_HOSTS SECTION ---
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost'] # Keep these for local development
+
+# Add your Render domain from environment variable, if it exists
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
+
+# --- END OF UPDATED ALLOWED_HOSTS SECTION ---
 
 
 # Application definition
@@ -38,7 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     
-     'main', 
+      'main', 
       
     'django.contrib.sites',
 ]
@@ -61,14 +70,14 @@ ROOT_URLCONF = 'blog_project.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # ✅ templates folder support
+        'DIRS': [BASE_DIR / 'templates'],   # ✅ templates folder support
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.messages',
             ],
         },
     },
